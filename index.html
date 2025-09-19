@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Noticias Caninas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -13,13 +13,11 @@
             --accent: #ff7a00;
             --text: #333;
             --muted: #777;
+            --column-bg-es: rgba(76, 175, 80, 0.05);
+            --column-bg-en: rgba(255, 122, 0, 0.05);
         }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Poppins', sans-serif;
@@ -31,422 +29,440 @@
         
         body::before {
             content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M20,30 Q30,20 40,30 T60,30 T70,40 T60,50 T40,50 T20,50 T10,40 T20,30' fill='none' stroke='%23c5e0c5' stroke-width='2'/%3E%3C/svg%3E");
-            opacity: 0.3;
-            z-index: -1;
-        }
-        
-        .main-header {
-            text-align: center;
-            margin: 20px 0 40px;
-            padding: 25px;
-            background: #4caf50;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .main-header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='60' viewBox='0 0 100 60'%3E%3Cpath d='M25,15 Q35,5 45,15 T65,15 T75,25 T65,35 T45,35 T25,35 T15,25 T25,15' fill='none' stroke='%23ffffff' stroke-width='1.5' opacity='0.2'/%3E%3C/svg%3E");
-            opacity: 0.2;
-        }
-        
-        .paw-text {
-            font-size: 3.5rem;
-            font-weight: 800;
-            color: white;
-            text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
-            letter-spacing: 2px;
-            position: relative;
-            display: inline-block;
-            margin: 0;
-        }
-        
-        .paw-text::before,
-        .paw-text::after {
-            content: "🐾";
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 2.5rem;
-            opacity: 0.8;
-        }
-        
-        .paw-text::before {
-            left: -50px;
-        }
-        
-        .paw-text::after {
-            right: -50px;
+            opacity: 0.3; z-index: -1;
         }
         
         header {
-            text-align: center;
-            margin-bottom: 20px;
+            text-align: center; margin: 20px 0 40px; padding: 25px;
+            background: #4caf50; border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative; overflow: hidden;
         }
         
-        header h1 {
-            font-size: 2.2rem;
-            font-weight: 600;
+        header .paw-text {
+            font-size: 3.5rem; font-weight: 800; color: white;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.2); letter-spacing: 2px;
+            position: relative; display: inline-block; margin: 0;
         }
         
-        header p {
-            color: var(--muted);
+        header .paw-text::before, header .paw-text::after {
+            content: "🐾"; position: absolute; top: 50%;
+            transform: translateY(-50%); font-size: 2.5rem; opacity: 0.8;
         }
-        
-        .tabs {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
+        header .paw-text::before { left: -50px; }
+        header .paw-text::after { right: -50px; }
+
+        header p { color: white; opacity: 0.9; margin-top: 5px; }
+
+        #lang-toggle {
+            position: fixed; bottom: 20px; right: 20px; z-index: 999;
+            background: var(--accent); color: #fff; border: 2px solid #fff;
+            border-radius: 50%; width: 56px; height: 56px; font-size: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0, 0.2); cursor: pointer;
+            transition: transform .3s; display: flex; align-items: center; justify-content: center;
         }
-        
-        .tabs button {
-            border: none;
-            padding: 12px 28px;
-            border-radius: 30px;
-            background: var(--card);
-            cursor: pointer;
-            font-weight: 600;
-            transition: .3s;
-            box-shadow: 0 2px 6px rgba(0,0,0,.05);
+        #lang-toggle:hover { transform: scale(1.1); }
+
+        .columns-container {
+            display: flex; flex-direction: column; gap: 25px;
+            max-width: 1400px; margin: auto;
         }
-        
-        .tabs button.active {
-            background: var(--accent);
-            color: #fff;
+
+        .column {
+            background: var(--card); border-radius: 12px; padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); border-top: 4px solid var(--accent);
         }
-        
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            max-width: 1200px;
-            margin: auto;
+        .column-es { background: var(--column-bg-es); border-color: #4caf50; }
+        .column-en { background: var(--column-bg-en); border-color: var(--accent); display: none;}
+        .show-both .column-en { display: block; }
+
+        .column-header {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 20px; padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
         }
-        
+        .column-header h2 { font-size: 1.5rem; font-weight: 600; }
+        .column-es .column-header h2 { color: #4caf50; }
+        .column-en .column-header h2 { color: var(--accent); }
+
+        .news-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
+
         .card {
-            background: var(--card);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,.08);
-            transition: .3s;
-            display: flex;
-            flex-direction: column;
+            background: var(--card); border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,.08); transition: .3s;
+            display: flex; flex-direction: column;
         }
-        
-        .card:hover {
-            transform: translateY(-4px);
-        }
-        
-        .card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
-        
-        .card-content {
-            padding: 18px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .card-content h3 {
-            font-size: 1.1rem;
-            line-height: 1.4;
-            margin-bottom: 10px;
-        }
-        
-        .card-content .source {
-            font-size: .85rem;
-            color: var(--muted);
-            margin-bottom: 10px;
-        }
-        
-        .card-content .date {
-            font-size: .8rem;
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
-        
+        .card:hover { transform: translateY(-4px); }
+        .card img { width: 100%; height: 180px; object-fit: cover; }
+        .card-content { padding: 18px; flex: 1; display: flex; flex-direction: column; }
+        .card-content h3 { font-size: 1.1rem; line-height: 1.4; margin-bottom: 10px; }
+        .card-content .source { font-size: .85rem; color: var(--muted); margin-bottom: 10px; }
+        .card-content .date { font-size: .8rem; color: var(--accent); margin-bottom: 8px; }
         .card-content a {
-            margin-top: auto;
-            align-self: flex-start;
-            color: var(--accent);
-            font-weight: 600;
-            text-decoration: none;
+            margin-top: auto; align-self: flex-start; color: var(--accent);
+            font-weight: 600; text-decoration: none;
         }
+        .card-content a:hover { text-decoration: underline; }
         
-        .card-content a:hover {
-            text-decoration: underline;
+        .translate-btn {
+            background-color: transparent; border: 1px solid var(--accent); color: var(--accent);
+            padding: 4px 8px; font-size: 0.75rem; font-family: 'Poppins', sans-serif;
+            cursor: pointer; margin-top: 10px; margin-bottom: 5px; align-self: flex-start;
+            border-radius: 20px; transition: background-color 0.3s, color 0.3s;
         }
-        
-        .loading {
-            text-align: center;
-            padding: 60px;
-            color: var(--muted);
+        .translate-btn:hover { background-color: var(--accent); color: #fff; }
+        .translate-btn:disabled {
+            border-color: var(--muted); color: var(--muted);
+            cursor: not-allowed; background-color: transparent;
         }
-        
+
+        .loading, .error-message {
+            text-align: center; padding: 60px; color: var(--muted); font-size: 1.2rem;
+        }
         #load-more-btn {
-            display: block;
-            margin: 20px auto;
-            padding: 12px 28px;
-            border: none;
-            border-radius: 30px;
-            background: var(--accent);
-            color: #fff;
-            cursor: pointer;
-            font-weight: 600;
-            box-shadow: 0 2px 6px rgba(0,0,0,.05);
-            transition: .3s;
+            display: block; margin: 30px auto; padding: 12px 28px; border: none;
+            border-radius: 30px; background: var(--accent); color: #fff;
+            cursor: pointer; font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,.1);
+            transition: .3s; font-size: 1rem;
         }
-        
-        #load-more-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,.1);
-        }
-        
+        #load-more-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,.15); }
         #load-more-btn:disabled {
-            background: var(--muted);
-            cursor: not-allowed;
-            opacity: 0.7;
+            background: var(--muted); cursor: not-allowed; opacity: 0.7;
         }
-        
-        .error-message {
-            text-align: center;
-            padding: 20px;
-            color: #d32f2f;
-            background-color: #ffebee;
-            border-radius: 8px;
-            margin: 20px auto;
-            max-width: 600px;
+
+        @media (min-width: 768px) {
+            .news-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        
-        .no-more-news {
-            text-align: center;
-            padding: 20px;
-            color: var(--muted);
-            font-style: italic;
+        @media (min-width: 1200px) {
+            .columns-container { flex-direction: row; }
+            .column { flex: 1; min-width: 300px; }
+            .news-grid { grid-template-columns: 1fr; }
+            .show-both .news-grid { grid-template-columns: 1fr; }
         }
+        @media (min-width: 1400px) {
+            .show-both .news-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
     </style>
 </head>
 <body>
-    <div class="main-header">
-        <h1 class="paw-text">EL MUNDO CANINO</h1>
-    </div>
     <header>
-        <h1><i class="fas fa-paw"></i> Noticias Caninas</h1>
-        <p>Las últimas noticias sobre el mundo de los perros</p>
+        <h1 class="paw-text">EL MUNDO CANINO</h1>
+        <p>Tu dosis diaria de noticias sobre los mejores amigos del hombre</p>
     </header>
-    <div class="tabs">
-        <button id="btn-es" class="active">Español</button>
-        <button id="btn-en">English</button>
+
+    <div class="columns-container">
+        <div class="column column-es">
+            <div class="column-header">
+                <i class="fas fa-bone"></i>
+                <h2>Noticias en Español</h2>
+            </div>
+            <div id="news-es" class="news-grid">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Buscando noticias...</div>
+            </div>
+        </div>
+        <div class="column column-en">
+            <div class="column-header">
+                <i class="fas fa-paw"></i>
+                <h2>News in English</h2>
+            </div>
+            <div id="news-en" class="news-grid">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Fetching news...</div>
+            </div>
+        </div>
     </div>
-    <div id="news-container" class="news-grid">
-        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Cargando noticias…</div>
-    </div>
+
     <button id="load-more-btn">Cargar más noticias</button>
+    <button id="lang-toggle" title="Cambiar vista de idioma">
+        <i class="fas fa-language"></i>
+    </button>
 
     <script>
-        const API_KEY = 'aaf83dcbd8694668ad89247b959db678';
-        const container = document.getElementById('news-container');
-        const btnEs = document.getElementById('btn-es');
-        const btnEn = document.getElementById('btn-en');
-        const loadMoreBtn = document.getElementById('load-more-btn');
-        
-        let lang = 'es';
-        let currentPage = 1;
-        let totalResults = 0;
-        let isLoading = false;
-        let allArticles = [];
+    /* ===== CONFIGURACIÓN DE APIS Y FUENTES ===== */
+    const API_KEYS = {
+        GNEWS: '42dd93284a0abf72a9a646d3b4a9c33e', // Clave de ejemplo
+        NEWSAPI: 'aaf83dcbd8694668ad89247b959db678' // Clave original
+    };
+    const CORS_PROXY = 'https://api.allorigins.win/get?url=';
 
-        // Función para verificar si una noticia está relacionada con perros
-        function isValidDogNews(article) {
-            if (!article.title) return false;
-            
-            const titleLower = article.title.toLowerCase();
-            const descriptionLower = article.description ? article.description.toLowerCase() : '';
-            const contentLower = article.content ? article.content.toLowerCase() : '';
-            
-            // Palabras clave que indican contenido relevante
-            const dogKeywords = ['perro', 'perros', 'dog', 'dogs', 'canino', 'canine', 'puppy', 'puppies', 'cachorro', 'cachorros', 'mascota', 'pet'];
-            const excludeKeywords = ['hot dog', 'hotdog', 'perrito caliente', 'perro caliente'];
-            
-            // Verificar que contiene palabras clave y no es sobre comida u otros temas no deseados
-            const hasDogKeyword = dogKeywords.some(keyword => 
-                titleLower.includes(keyword) || 
-                descriptionLower.includes(keyword) ||
-                contentLower.includes(keyword)
-            );
-            
-            const hasExcludeKeyword = excludeKeywords.some(keyword => 
-                titleLower.includes(keyword) || 
-                descriptionLower.includes(keyword) ||
-                contentLower.includes(keyword)
-            );
-            
-            return hasDogKeyword && !hasExcludeKeyword;
+    const RSS_FEEDS_ES = [
+        { url: 'https://www.consumer.es/mascotas/perros.rss', name: 'Consumer.es Mascotas' },
+        { url: 'https://www.expertoanimal.com/rss/perros.xml', name: 'ExpertoAnimal' },
+        { url: 'https://www.animalpolitico.com/seccion/medio-ambiente/feed', name: 'Animal Político (Medio Ambiente)'}
+    ];
+    const RSS_FEEDS_EN = [
+        { url: 'https://www.dogster.com/feed', name: 'Dogster' },
+        { url: 'https://thebark.com/rss.xml', name: 'The Bark' },
+        { url: 'https://www.akc.org/feed/', name: 'American Kennel Club' }
+    ];
+
+    const articlesPerPage = 10;
+
+    /* ===== REFERENCIAS DOM ===== */
+    const newsEsContainer = document.getElementById('news-es');
+    const newsEnContainer = document.getElementById('news-en');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    const langToggleBtn = document.getElementById('lang-toggle');
+    const columnsContainer = document.querySelector('.columns-container');
+
+    /* ===== ESTADO GLOBAL ===== */
+    let currentPage = 1;
+    let uniqueArticlesEs = [];
+    let uniqueArticlesEn = [];
+    let isLoading = false;
+    let currentLangMode = 'es'; // 'es', 'en', 'both'
+
+    /* ===== FUNCIONES AUXILIARES ===== */
+    function normalizeTitle(title) {
+        if (!title) return '';
+        return title.toLowerCase().replace(/[^\w\s]/gi, '').trim().substring(0, 50);
+    }
+
+    function getImageUrl(article, item) {
+        // Prioridad: Imagen de la API
+        if (article.urlToImage || article.image || article.image_url) {
+            return article.urlToImage || article.image || article.image_url;
         }
-
-        btnEs.onclick = () => {
-            if (lang !== 'es') {
-                lang = 'es';
-                setActive(btnEs);
-                resetAndLoadNews();
-            }
-        };
-
-        btnEn.onclick = () => {
-            if (lang !== 'en') {
-                lang = 'en';
-                setActive(btnEn);
-                resetAndLoadNews();
-            }
-        };
-
-        function setActive(btn) {
-            [btnEs, btnEn].forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        // Fallback: Buscar imagen en el contenido RSS
+        if (item) {
+            const content = item.querySelector("content")?.textContent || item.querySelector("description")?.textContent || '';
+            const imgMatch = content.match(/<img[^>]+src="([^">]+)"/);
+            if (imgMatch && imgMatch[1]) return imgMatch[1];
         }
+        // Fallback final
+        return 'https://via.placeholder.com/400x250?text=Imagen+no+disponible';
+    }
 
-        async function fetchNews(page) {
-            if (isLoading) return { articles: [], totalResults: 0 };
-            
-            isLoading = true;
-            loadMoreBtn.disabled = true;
-            
-            try {
-                // Construir la URL correctamente
-                const query = lang === 'es' 
-                    ? 'perro OR perros OR canino OR caninos' 
-                    : 'dog OR dogs OR canine OR canines';
-                
-                const apiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=${lang}&page=${page}&sortBy=publishedAt&apiKey=${API_KEY}`;
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
-                
-                const res = await fetch(proxyUrl);
-                if (!res.ok) throw new Error('Error en la respuesta de la API');
-                
-                const raw = await res.json();
-                const data = JSON.parse(raw.contents);
-                
-                if (data.status !== 'ok') {
-                    throw new Error(data.message || 'Error en la respuesta de la API');
-                }
-                
-                // Filtrar y ordenar artículos por fecha (más recientes primero)
-                const filteredArticles = data.articles.filter(isValidDogNews);
-                filteredArticles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
-                
-                return {
-                    articles: filteredArticles,
-                    totalResults: data.totalResults
+    function extractDescription(item) {
+        const content = item.querySelector("description")?.textContent || item.querySelector("content")?.textContent || '';
+        const div = document.createElement('div');
+        div.innerHTML = content;
+        const text = div.textContent || div.innerText || "";
+        return text.trim().substring(0, 150) + (text.length > 150 ? '...' : '');
+    }
+
+    /* ===== LLAMADAS A FUENTES ===== */
+    async function fetchFromGNews(lang) {
+        try {
+            const query = lang === 'es' ? 'perro OR cachorro OR canino' : 'dog OR puppy OR canine';
+            const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=${lang}&max=10&apikey=${API_KEYS.GNEWS}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`GNews falló: ${res.status}`);
+            const data = await res.json();
+            return (data.articles || []).map(a => ({ ...a, urlToImage: getImageUrl(a) }));
+        } catch (e) { console.error("Error en GNews:", e); return []; }
+    }
+
+    async function fetchFromNewsAPI(lang) {
+        try {
+            const query = lang === 'es' ? 'perro OR mascota' : 'dog OR pet';
+            const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=${lang}&sortBy=publishedAt&pageSize=10&apiKey=${API_KEYS.NEWSAPI}`;
+            const res = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`);
+            if (!res.ok) throw new Error(`NewsAPI falló: ${res.status}`);
+            const raw = await res.json();
+            const data = JSON.parse(raw.contents);
+            return (data.articles || []).map(a => ({ ...a, urlToImage: getImageUrl(a) }));
+        } catch (e) { console.error("Error en NewsAPI:", e); return []; }
+    }
+    
+    async function fetchFromRSS(feed) {
+        try {
+            const res = await fetch(`${CORS_PROXY}${encodeURIComponent(feed.url)}`);
+            if (!res.ok) throw new Error(`Fallo en RSS para ${feed.name}: ${res.status}`);
+            const raw = await res.json();
+            const xmlText = raw.contents;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(xmlText, "application/xml");
+            const items = Array.from(doc.querySelectorAll("item, entry"));
+            return items.map(item => {
+                const article = {
+                    title: item.querySelector("title")?.textContent || 'Sin título',
+                    url: item.querySelector("link")?.getAttribute('href') || item.querySelector("link")?.textContent || '',
+                    publishedAt: new Date(item.querySelector("pubDate")?.textContent || new Date()).toISOString(),
+                    description: extractDescription(item),
+                    source: { name: feed.name }
                 };
-            } catch (err) {
-                console.error('Error fetching news:', err);
-                container.innerHTML = `<div class="error-message">Error al cargar noticias: ${err.message}. Inténtalo más tarde.</div>`;
-                return { articles: [], totalResults: 0 };
-            } finally {
-                isLoading = false;
-            }
-        }
-
-        function displayNews(articles) {
-            if (articles.length === 0) {
-                if (currentPage === 1) {
-                    container.innerHTML = '<div class="loading">No se encontraron noticias recientes.</div>';
-                } else {
-                    const noMoreNews = document.createElement('div');
-                    noMoreNews.className = 'no-more-news';
-                    noMoreNews.textContent = lang === 'es' ? 'No hay más noticias disponibles.' : 'No more news available.';
-                    container.appendChild(noMoreNews);
-                }
-                loadMoreBtn.style.display = 'none';
-                return;
-            }
-
-            articles.forEach(art => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <img src="${art.urlToImage || 'https://via.placeholder.com/300x180?text=Imagen+no+disponible'}" alt="${art.title}">
-                    <div class="card-content">
-                        <span class="date">${new Date(art.publishedAt).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US')}</span>
-                        <h3>${art.title}</h3>
-                        <p class="source"><i class="fas fa-newspaper"></i> ${art.source.name}</p>
-                        <a href="${art.url}" target="_blank" rel="noopener">${lang === 'es' ? 'Leer más →' : 'Read more →'}</a>
-                    </div>
-                `;
-                container.appendChild(card);
+                article.urlToImage = getImageUrl({}, item);
+                return article;
             });
-        }
+        } catch (e) { console.error(`Error en RSS ${feed.name}:`, e); return []; }
+    }
 
-        function resetAndLoadNews() {
-            currentPage = 1;
-            totalResults = 0;
-            allArticles = [];
-            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> ' + 
-                                  (lang === 'es' ? 'Cargando noticias…' : 'Loading news…') + '</div>';
-            loadMoreBtn.disabled = false;
-            loadMoreBtn.style.display = 'block';
-            loadMoreBtn.textContent = lang === 'es' ? 'Cargar más noticias' : 'Load more news';
-            loadNews();
-        }
+    async function fetchNews(lang) {
+        let fetchPromises = [fetchFromGNews(lang), fetchFromNewsAPI(lang)];
+        const rssFeeds = lang === 'es' ? RSS_FEEDS_ES : RSS_FEEDS_EN;
+        rssFeeds.forEach(feed => fetchPromises.push(fetchFromRSS(feed)));
 
-        async function loadNews() {
-            if (isLoading) return;
+        const results = await Promise.allSettled(fetchPromises);
+        let allFetchedArticles = [];
+        results.forEach(result => {
+            if (result.status === 'fulfilled' && Array.isArray(result.value)) {
+                allFetchedArticles.push(...result.value);
+            }
+        });
+        
+        allFetchedArticles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+        return allFetchedArticles.filter(a => a.title && a.url && a.source && !a.title.toLowerCase().includes('[removed]'));
+    }
+
+    /* ===== RENDERIZADO ===== */
+    function renderArticles(articles, container, lang) {
+        if (container.querySelector('.loading')) container.innerHTML = '';
+        
+        const fragment = document.createDocumentFragment();
+        articles.forEach(art => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const date = new Date(art.publishedAt).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US');
+            const fallback = 'https://via.placeholder.com/400x250?text=Imagen+no+disponible';
+
+            const translateButtonHtml = lang === 'en' ? `
+                <button class="translate-btn"
+                        data-title="${(art.title || '').replace(/"/g, '&quot;')}"
+                        data-desc="${(art.description || '').replace(/"/g, '&quot;')}">
+                    <i class="fas fa-language"></i> Traducir
+                </button>` : '';
+
+            card.innerHTML = `
+                <img src="${art.urlToImage || fallback}" alt="${art.title}" loading="lazy" onerror="this.src='${fallback}'">
+                <div class="card-content">
+                    <span class="date">${date}</span>
+                    <h3>${art.title}</h3>
+                    <p class="source"><i class="fas fa-newspaper"></i> ${art.source.name}</p>
+                    ${translateButtonHtml}
+                    <a href="${art.url}" target="_blank" rel="noopener">${lang === 'es' ? 'Leer más →' : 'Read more →'}</a>
+                </div>
+            `;
+            fragment.appendChild(card);
+        });
+        container.appendChild(fragment);
+    }
+    
+    /* ===== LÓGICA DE CARGA Y PAGINACIÓN ===== */
+    async function loadAndShowArticles(isInitialLoad = false) {
+        if (isLoading) return;
+        isLoading = true;
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = isInitialLoad ? 'Cargando...' : 'Añadiendo más...';
+
+        try {
+            if (isInitialLoad) {
+                currentPage = 1;
+                const [fetchedEs, fetchedEn] = await Promise.all([fetchNews('es'), fetchNews('en')]);
+
+                const seenTitlesEs = new Set();
+                uniqueArticlesEs = fetchedEs.filter(article => {
+                    const normalized = normalizeTitle(article.title);
+                    if (normalized && !seenTitlesEs.has(normalized)) {
+                        seenTitlesEs.add(normalized);
+                        return true;
+                    }
+                    return false;
+                });
+
+                const seenTitlesEn = new Set();
+                uniqueArticlesEn = fetchedEn.filter(article => {
+                    const normalized = normalizeTitle(article.title);
+                    if (normalized && !seenTitlesEn.has(normalized)) {
+                        seenTitlesEn.add(normalized);
+                        return true;
+                    }
+                    return false;
+                });
+            }
+
+            const start = (currentPage - 1) * articlesPerPage;
+            const end = currentPage * articlesPerPage;
+
+            const articlesToRenderEs = uniqueArticlesEs.slice(start, end);
+            const articlesToRenderEn = uniqueArticlesEn.slice(start, end);
+
+            renderArticles(articlesToRenderEs, newsEsContainer, 'es');
+            renderArticles(articlesToRenderEn, newsEnContainer, 'en');
             
-            const newsData = await fetchNews(currentPage);
-            
-            if (newsData.articles.length > 0) {
-                allArticles = [...allArticles, ...newsData.articles];
-                
-                if (currentPage === 1) {
-                    container.innerHTML = '';
-                }
-                
-                displayNews(newsData.articles);
-                
-                // Actualizar estado del botón de carga
-                const hasMoreArticles = allArticles.length < newsData.totalResults;
-                loadMoreBtn.disabled = !hasMoreArticles;
-                
-                if (!hasMoreArticles) {
-                    loadMoreBtn.textContent = lang === 'es' ? 'No hay más noticias' : 'No more news';
-                }
-                
+            if (newsEsContainer.innerHTML === '' && articlesToRenderEs.length === 0) newsEsContainer.innerHTML = '<div class="loading">No se encontraron noticias.</div>';
+            if (newsEnContainer.innerHTML === '' && articlesToRenderEn.length === 0) newsEnContainer.innerHTML = '<div class="loading">No news found.</div>';
+
+            const hasMore = (end < uniqueArticlesEs.length) || (end < uniqueArticlesEn.length);
+            if (hasMore) {
                 currentPage++;
+                loadMoreBtn.disabled = false;
+                loadMoreBtn.textContent = 'Cargar más noticias';
+                loadMoreBtn.style.display = 'block';
             } else {
-                // No hay más artículos
-                if (currentPage === 1) {
-                    container.innerHTML = '<div class="loading">No se encontraron noticias recientes.</div>';
-                } else {
-                    const noMoreNews = document.createElement('div');
-                    noMoreNews.className = 'no-more-news';
-                    noMoreNews.textContent = lang === 'es' ? 'No hay más noticias disponibles.' : 'No more news available.';
-                    container.appendChild(noMoreNews);
-                }
                 loadMoreBtn.style.display = 'none';
             }
+        } catch (err) {
+            console.error(err);
+            newsEsContainer.innerHTML = '<div class="error-message">Error al cargar noticias.</div>';
+            newsEnContainer.innerHTML = '<div class="error-message">Error loading news.</div>';
+        } finally {
+            isLoading = false;
         }
+    }
+    
+    /* ===== FUNCIONALIDAD DE TRADUCCIÓN ===== */
+    async function handleTranslation(event) {
+        if (!event.target.classList.contains('translate-btn')) return;
 
-        loadMoreBtn.addEventListener('click', loadNews);
+        const btn = event.target;
+        const cardContent = btn.closest('.card-content');
+        const titleEl = cardContent.querySelector('h3');
 
-        // Cargar noticias inicialmente
-        loadNews();
+        const originalTitle = btn.dataset.title;
+        const originalDesc = btn.dataset.desc; // Aunque no se muestra, lo traducimos por si se añade en el futuro
+        if (!originalTitle) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        try {
+            const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(originalTitle)}&langpair=en|es`);
+            if (!response.ok) throw new Error('API de traducción no disponible');
+            
+            const data = await response.json();
+            if (data.responseData && data.responseData.translatedText) {
+                titleEl.textContent = data.responseData.translatedText;
+                btn.innerHTML = '<i class="fas fa-check"></i> Traducido';
+            } else { throw new Error('Respuesta de traducción inválida'); }
+        } catch (error) {
+            console.error('Fallo en la traducción:', error);
+            btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-language"></i> Traducir';
+            }, 3000);
+        }
+    }
+
+    newsEnContainer.addEventListener('click', handleTranslation);
+    
+    /* ===== MANEJADORES DE EVENTOS ===== */
+    loadMoreBtn.addEventListener('click', () => loadAndShowArticles(false));
+
+    langToggleBtn.addEventListener('click', () => {
+        if (currentLangMode === 'es') { // Cambia a EN
+            columnsContainer.classList.remove('show-both');
+            document.querySelector('.column-es').style.display = 'none';
+            document.querySelector('.column-en').style.display = 'block';
+            currentLangMode = 'en';
+        } else if (currentLangMode === 'en') { // Cambia a BOTH
+            columnsContainer.classList.add('show-both');
+            document.querySelector('.column-es').style.display = 'block';
+            document.querySelector('.column-en').style.display = 'block';
+            currentLangMode = 'both';
+        } else { // Cambia a ES
+            columnsContainer.classList.remove('show-both');
+            document.querySelector('.column-es').style.display = 'block';
+            document.querySelector('.column-en').style.display = 'none';
+            currentLangMode = 'es';
+        }
+    });
+
+    // Carga inicial de noticias
+    loadAndShowArticles(true);
     </script>
 </body>
 </html>
