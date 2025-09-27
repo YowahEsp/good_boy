@@ -5,10 +5,10 @@
     <title>El Mundo Canino - Noticias de Perros</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="   https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css   ">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #a5d6a7; /* Verde claro para el fondo */
+            --bg: #a5d6a7;
             --card: #fff;
             --accent: #ff9e01;
             --secondary: #4caf50;
@@ -16,12 +16,12 @@
             --muted: #777;
             --column-bg-es: rgba(255, 158, 1, 0.08);
             --column-bg-en: rgba(76, 175, 80, 0.08);
-            --paw-pattern: url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M20,20 Q25,10 35,20 T50,20 Q55,25 50,35 T50,50 Q45,55 35,50 T20,50 Q15,45 20,35 T20,20' fill='none' stroke='%23ff9e01' stroke-width='1.5' opacity='0.2'/%3E%3C/svg%3E");
+            --paw-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M20,20 Q25,10 35,20 T50,20 Q55,25 50,35 T50,50 Q45,55 35,50 T20,50 Q15,45 20,35 T20,20' fill='none' stroke='%23ff9e01' stroke-width='1.5' opacity='0.2'/%3E%3C/svg%3E");
         }
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Nunito', sans-serif;
-            background: var(--bg); /* Fondo verde en todo el body */
+            background: var(--bg);
             background-image: var(--paw-pattern);
             color: var(--text);
             padding: 20px 10px;
@@ -263,7 +263,7 @@
         <div class="leaf-decoration leaf-5">🍃</div>
         <div class="leaf-decoration leaf-6">🌱</div>
         <h1>
-            <img src="https://www.akc.org/wp-content/uploads/2017/11/Havanese-running-on-the-beach.jpg   " alt="el canino logo">
+            <img src="https://www.akc.org/wp-content/uploads/2017/11/Havanese-running-on-the-beach.jpg" alt="el canino logo">
             el canino
         </h1>
         <p>Las últimas noticias sobre perros, razas, cuidados y entrenamiento</p>
@@ -289,7 +289,7 @@
         </div>
     </div>
 
-    <button id="load-more" class="load-more">Cargar más</button>
+    <button id="load-more">Cargar más</button>
 
     <button id="lang-toggle" title="Cambiar idioma"><i class="fas fa-language"></i></button>
 
@@ -297,6 +297,11 @@
         const API_KEYS = {
             NEWSAPI: 'aaf83dcbd8694668ad89247b959db678',
             GNEWS: '42dd93284a0abf72a9a646d3b4a9c33e'
+        };
+        // ✅ URLs de RSS corregidas: sin espacios al final
+        const RSS_FEEDS = {
+            es: 'https://www.srperro.com/rss/',
+            en: 'https://www.dogster.com/feed'
         };
         const CORS_PROXY = 'https://corsproxy.io/?';
         const dogKeywords = ['perro', 'canino', 'cachorro', 'mascota', 'dog', 'puppy', 'canine', 'pet', 'raza', 'breed'];
@@ -312,10 +317,11 @@
 
         const state = {
             page: { es: 1, en: 1 },
-            viewMode: 'es', // es, en, both
+            viewMode: 'es',
             isLoading: false,
             seenIds: new Set(),
             allNewsLoaded: { es: false, en: false },
+            rssFallback: { es: false, en: false }
         };
 
         function getArticleId(article) {
@@ -330,31 +336,71 @@
         async function fetchFromGNews(lang, page) {
             try {
                 const query = lang === 'es' ? 'perro OR canino' : 'dog OR canine';
-                const url = `   https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=${lang}&page=${page}&max=10&apikey=${API_KEYS.GNEWS}`;
-                const res = await fetch(url);
+                const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=${lang}&page=${page}&max=10&apikey=${API_KEYS.GNEWS}`;
+                // ✅ Usamos CORS proxy para mayor compatibilidad
+                const res = await fetch(CORS_PROXY + encodeURIComponent(url));
+                if (!res.ok) throw new Error(`GNews failed: ${res.status}`);
                 const data = await res.json();
                 return data.articles?.map(art => ({ ...art, urlToImage: art.image })) || [];
-            } catch (e) { return []; }
+            } catch (e) {
+                console.error("GNews Fetch Error:", e);
+                return [];
+            }
         }
 
         async function fetchFromNewsAPI(lang, page) {
             try {
                 const query = lang === 'es' ? 'perro OR cachorro' : 'dog OR canine';
-                const url = `   https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=${lang}&page=${page}&pageSize=20&sortBy=publishedAt&apiKey=${API_KEYS.NEWSAPI}`;
+                const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=${lang}&page=${page}&pageSize=20&sortBy=publishedAt&apiKey=${API_KEYS.NEWSAPI}`;
                 const res = await fetch(CORS_PROXY + encodeURIComponent(url));
+                if (!res.ok) throw new Error(`NewsAPI failed: ${res.status}`);
                 const data = await res.json();
                 return data.articles || [];
-            } catch (e) { return []; }
+            } catch (e) {
+                console.error("NewsAPI Fetch Error:", e);
+                return [];
+            }
+        }
+
+        async function fetchFromRSS(lang) {
+            try {
+                const rssUrl = RSS_FEEDS[lang];
+                if (!rssUrl) return [];
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
+                if (!res.ok) throw new Error(`RSS fetch failed: ${res.status}`);
+                const data = await res.json();
+                
+                return data.items.map(item => ({
+                    title: item.title,
+                    description: item.description.replace(/<[^>]*>?/gm, '').substring(0, 200) + '...',
+                    url: item.link,
+                    urlToImage: item.thumbnail,
+                    publishedAt: item.pubDate,
+                    source: { name: `RSS - ${data.feed.title}` }
+                }));
+            } catch (e) {
+                console.error("RSS Fetch Error:", e);
+                return [];
+            }
         }
 
         async function fetchAllNews(lang, page) {
-            const [gnews, newsapi] = await Promise.all([
+            if (state.rssFallback[lang]) return [];
+
+            // ✅ Intentamos ambas APIs con CORS proxy
+            const apiResults = await Promise.allSettled([
                 fetchFromGNews(lang, page),
                 fetchFromNewsAPI(lang, page),
             ]);
 
-            const combined = [...gnews, ...newsapi];
-            const unique = combined.filter(art => {
+            let combined = [];
+            apiResults.forEach(result => {
+                if (result.status === 'fulfilled' && Array.isArray(result.value)) {
+                    combined.push(...result.value);
+                }
+            });
+
+            let unique = combined.filter(art => {
                 const id = getArticleId(art);
                 if (!art.title || !art.url || !art.publishedAt || state.seenIds.has(id) || !isDogRelated(art)) {
                     return false;
@@ -362,27 +408,43 @@
                 state.seenIds.add(id);
                 return true;
             });
+
+            // ✅ Si no hay noticias de APIs, usamos RSS
+            if (unique.length === 0 && !state.rssFallback[lang]) {
+                console.warn(`APIs for lang '${lang}' returned no valid news. Trying RSS fallback.`);
+                unique = await fetchFromRSS(lang);
+                state.rssFallback[lang] = true;
+            }
             
             return unique.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
         }
         
         const getDogImageUrl = () => {
             const dogImages = [
-                '   https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&h=250&fit=crop&auto=format&q=80',
-                '   https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=250&fit=crop&auto=format&q=80',
-                '   https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&h=250&fit=crop&auto=format&q=80'
+                'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&h=250&fit=crop&auto=format&q=80',
+                'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=250&fit=crop&auto=format&q=80',
+                'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&h=250&fit=crop&auto=format&q=80'
             ];
             return dogImages[Math.floor(Math.random() * dogImages.length)];
         }
 
-
         function renderArticles(articles, container, lang) {
             if (container.querySelector('.loading')) container.innerHTML = '';
-            if (articles.length === 0 && container.innerHTML === '') {
-                 container.innerHTML = '<div class="no-more-news">No se encontraron más noticias.</div>';
-                 state.allNewsLoaded[lang] = true;
-                 updateLoadMoreButton();
-                 return;
+            
+            if (articles.length === 0) {
+                if (container.innerHTML !== '') {
+                    if (!container.querySelector('.no-more-news')) {
+                        const noMore = document.createElement('div');
+                        noMore.className = 'no-more-news';
+                        noMore.textContent = 'No se encontraron más noticias.';
+                        container.appendChild(noMore);
+                    }
+                } else {
+                    container.innerHTML = '<div class="error-message">No se pudieron cargar noticias. Inténtalo más tarde.</div>';
+                }
+                state.allNewsLoaded[lang] = true;
+                updateLoadMoreButton();
+                return;
             }
             
             const fragment = document.createDocumentFragment();
@@ -418,8 +480,9 @@
         }
         
         async function handleTranslation(event) {
-            if (!event.target.classList.contains('translate-btn')) return;
-            const btn = event.target;
+            const btn = event.target.closest('.translate-btn');
+            if (!btn) return;
+
             const card = btn.closest('.card');
             const titleEl = card.querySelector('h3');
             const descEl = card.querySelector('.description');
@@ -429,7 +492,7 @@
             
             try {
                 const text = `${btn.dataset.title} ||| ${btn.dataset.desc}`;
-                const res = await fetch(`   https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|es`);
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|es`);
                 const data = await res.json();
                 const [translatedTitle, translatedDesc] = data.responseData.translatedText.split(' ||| ');
                 if (titleEl && translatedTitle) titleEl.textContent = translatedTitle.trim();
@@ -442,39 +505,39 @@
         }
 
         async function loadNews(isInitial = false) {
-             if (state.isLoading) return;
-             state.isLoading = true;
-             DOM.loadMoreBtn.disabled = true;
-             DOM.loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+            if (state.isLoading) return;
+            state.isLoading = true;
+            DOM.loadMoreBtn.disabled = true;
+            DOM.loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
 
-             const loadForLang = async (lang) => {
-                 if (state.allNewsLoaded[lang]) return;
-                 const news = await fetchAllNews(lang, state.page[lang]);
-                 renderArticles(news, lang === 'es' ? DOM.newsEs : DOM.newsEn, lang);
-                 if (news.length > 0) {
-                     state.page[lang]++;
-                 } else {
-                     state.allNewsLoaded[lang] = true;
-                 }
-             };
+            const loadForLang = async (lang) => {
+                if (state.allNewsLoaded[lang]) return;
+                const news = await fetchAllNews(lang, state.page[lang]);
+                renderArticles(news, lang === 'es' ? DOM.newsEs : DOM.newsEn, lang);
+                if (news.length > 0 && !state.rssFallback[lang]) {
+                    state.page[lang]++;
+                } else {
+                    state.allNewsLoaded[lang] = true;
+                }
+            };
 
-             if (isInitial) {
-                 await Promise.all([loadForLang('es'), loadForLang('en')]);
-             } else {
-                 if (state.viewMode === 'es') await loadForLang('es');
-                 else if (state.viewMode === 'en') await loadForLang('en');
-                 else if (state.viewMode === 'both') {
-                     await Promise.all([
+            if (isInitial) {
+                await Promise.all([loadForLang('es'), loadForLang('en')]);
+            } else {
+                if (state.viewMode === 'es') await loadForLang('es');
+                else if (state.viewMode === 'en') await loadForLang('en');
+                else if (state.viewMode === 'both') {
+                    await Promise.all([
                         DOM.colEs.style.display !== 'none' && loadForLang('es'),
                         DOM.colEn.style.display !== 'none' && loadForLang('en')
-                     ]);
-                 }
-             }
+                    ].filter(Boolean)); // ✅ Evita pasar "false" a Promise.all
+                }
+            }
 
-             state.isLoading = false;
-             DOM.loadMoreBtn.disabled = false;
-             DOM.loadMoreBtn.innerHTML = 'Cargar más';
-             updateLoadMoreButton();
+            state.isLoading = false;
+            DOM.loadMoreBtn.disabled = false;
+            DOM.loadMoreBtn.innerHTML = 'Cargar más';
+            updateLoadMoreButton();
         }
 
         function updateLoadMoreButton() {
@@ -495,9 +558,9 @@
         DOM.loadMoreBtn.addEventListener('click', () => loadNews(false));
         DOM.newsEn.addEventListener('click', handleTranslation);
         DOM.langToggleBtn.addEventListener('click', () => {
-            if (state.viewMode === 'es') state.viewMode = 'en';
-            else if (state.viewMode === 'en') state.viewMode = 'both';
-            else state.viewMode = 'es';
+            const modes = ['es', 'en', 'both'];
+            const currentIndex = modes.indexOf(state.viewMode);
+            state.viewMode = modes[(currentIndex + 1) % modes.length];
             updateView();
         });
 
